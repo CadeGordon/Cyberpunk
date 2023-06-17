@@ -164,6 +164,10 @@ public:
 
 	void StopHover();
 
+	void AirDash();
+
+	void ResetAirDash();
+
 
 
 private:
@@ -173,11 +177,15 @@ private:
 	bool IsJumping;
 	bool IsGrounded;
 	bool IsHovering;
+	bool CanAirDash;
 	float HoverForce;
 	float DoubleJumpVelocity;
 	float JumpCooldownTime;
 	float HoverDescentSpeed;
+	float DashDistance;
+	float DashCoolDownTime;
 	FTimerHandle JumpCooldownTimerHandle;
+	FTimerHandle DashCooldownTimerHandle;
 	
 
 

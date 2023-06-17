@@ -27,10 +27,15 @@ ACyberpunkCharacter::ACyberpunkCharacter()
 
 	JumpCooldownTime = 1.0f;
 
+	DashCoolDownTime = 1.0f;
+
 	DoubleJumpVelocity = 800.0f;
 
 	HoverDescentSpeed = 20.0f;
 
+	DashDistance = 1000.0f;
+
+	CanAirDash = true;
 	IsHovering = false;
 
 	// Set size for collision capsule
@@ -134,6 +139,8 @@ void ACyberpunkCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 
 	PlayerInputComponent->BindAction("Hover", IE_Pressed, this, &ACyberpunkCharacter::StartHover);
 	PlayerInputComponent->BindAction("Hover", IE_Released, this, &ACyberpunkCharacter::StopHover);
+
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACyberpunkCharacter::AirDash);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACyberpunkCharacter::OnFire);
@@ -379,7 +386,7 @@ void ACyberpunkCharacter::DoubleJump()
 
 			IsJumping = true;
 
-			GetWorldTimerManager().SetTimer(JumpCooldownTimerHandle, this, &ACyberpunkCharacter::ResetJump, JumpCooldownTime, false);
+			GetWorldTimerManager().SetTimer(JumpCooldownTimerHandle, this, &ACyberpunkCharacter::ResetJump, DashCoolDownTime, false);
 
 		}
 
@@ -418,6 +425,27 @@ void ACyberpunkCharacter::StopHover()
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 	}
+}
+
+void ACyberpunkCharacter::AirDash()
+{
+	if (CanAirDash && !IsJumping) {
+
+		const FVector DashDirection = GetActorForwardVector();
+
+		const FVector DashVelocity = DashDirection * DashDistance;
+
+		LaunchCharacter(DashVelocity, true, true);
+
+		CanAirDash = false;
+
+		GetWorldTimerManager().SetTimer(DashCooldownTimerHandle, this, &ACyberpunkCharacter::ResetAirDash, JumpCooldownTime, false);
+	}
+}
+
+void ACyberpunkCharacter::ResetAirDash()
+{
+	CanAirDash = true;
 }
 
 
