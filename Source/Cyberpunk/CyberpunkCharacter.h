@@ -160,6 +160,10 @@ public:
 
 	void ResetJump();
 
+	void StartHover();
+
+	void StopHover();
+
 
 
 private:
@@ -168,8 +172,11 @@ private:
 	bool CanDoubleJump;
 	bool IsJumping;
 	bool IsGrounded;
+	bool IsHovering;
+	float HoverForce;
 	float DoubleJumpVelocity;
 	float JumpCooldownTime;
+	float HoverDescentSpeed;
 	FTimerHandle JumpCooldownTimerHandle;
 	
 

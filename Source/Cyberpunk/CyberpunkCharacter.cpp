@@ -29,6 +29,10 @@ ACyberpunkCharacter::ACyberpunkCharacter()
 
 	DoubleJumpVelocity = 800.0f;
 
+	HoverDescentSpeed = 20.0f;
+
+	IsHovering = false;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
@@ -128,6 +132,8 @@ void ACyberpunkCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACyberpunkCharacter::DoubleJump);
 
+	PlayerInputComponent->BindAction("Hover", IE_Pressed, this, &ACyberpunkCharacter::StartHover);
+	PlayerInputComponent->BindAction("Hover", IE_Released, this, &ACyberpunkCharacter::StopHover);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACyberpunkCharacter::OnFire);
@@ -154,10 +160,17 @@ void ACyberpunkCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
 	if (GetCharacterMovement()->IsMovingOnGround()) {
 		CanDoubleJump = true;
 	}
+
+	if (IsHovering) {
+		FVector DescentForce = FVector(0.0f, 0.0f, -HoverDescentSpeed);
+		AddMovementInput(DescentForce, DeltaTime);
+	}
+
+	
+
 }
 
 void ACyberpunkCharacter::OnFire()
@@ -377,6 +390,34 @@ void ACyberpunkCharacter::DoubleJump()
 void ACyberpunkCharacter::ResetJump()
 {
 	IsJumping = false;
+
+	if (IsHovering) {
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	}
+}
+
+void ACyberpunkCharacter::StartHover()
+{
+	if (!IsJumping) {
+		IsHovering = true;
+
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	}
+}
+
+void ACyberpunkCharacter::StopHover()
+{
+	IsHovering = false;
+
+	// Reset the character's movement mode to the default (falling or walking)
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+	else
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+	}
 }
 
 
