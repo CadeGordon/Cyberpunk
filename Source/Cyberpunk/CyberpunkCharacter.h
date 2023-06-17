@@ -164,6 +164,7 @@ public:
 
 	void StopHover();
 
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void AirDash();
 
 	void ResetAirDash();
